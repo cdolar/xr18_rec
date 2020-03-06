@@ -2,7 +2,25 @@
 
 {% block title %}Index{% endblock title %}
 
-{% block content %}
-    <h1>Hello World</h1>
-    <button>Press me</button>
-{% endblock content %}
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>XR18 Recorder</h1>
+            <div class="btn-group" role="group" aria-label="recorder control">
+                <button type="button" class="btn btn-lg btn-danger" id="record-btn" name="record-btn">Record</button>
+                <button type="button" class="btn btn-lg btn-secondary" id="stop-btn" name="stop-btn">Stop</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main %}
+
+{% block script %}
+$('#record-btn').click(
+    function()
+    {
+        
+    }
+)
+{% endblock script %}
