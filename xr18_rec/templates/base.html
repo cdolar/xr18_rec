@@ -1,0 +1,9 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} - XR18Rec</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='wing.min.css') }}">
+<div class="nav">
+  <h5 class="nav-logo">XAir XR18 Recorder</h5>
+</div>
+<div class="center">
+    {% block content %}{% endblock %}
+</div>
