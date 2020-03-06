@@ -1,5 +1,11 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify, make_response
 from flask import current_app as app
+
+from subprocess import Popen, PIPE
+from datetime import datetime
+from time import sleep
+
+import os
 
 api = Blueprint("api", __name__)
 
@@ -8,7 +14,8 @@ proc = None
 @api.route("/rec")
 def rec():
     filename = datetime.now().strftime('%Y-%m-%d--%H-%M-%S__xr18rec.wav')
-    audiodev = "hw:X18XR18,0"
+    #audiodev = "hw:X18XR18,0"
+    audiodev = "hw:CODEC,0"
     buffersize = 512*1024
     channels = 12
     bits = 24
@@ -23,27 +30,33 @@ def rec():
         '-r {}'.format(rate),
         filename
     ]
-    proc = Popen(cmd, env=env)
+    proc = Popen(cmd, env=env, stdout=PIPE, stderr=PIPE, text=True)
+    (output, err) = proc.communicate(timeout=2)
+    return make_response(jsonify({"status":"started recording", "filename":filename, "output":output, "error":err}))
 
 @api.route("/stop")
 def stop():
+    status = ""
     if proc is None:
-        print("No recording running to stop")
+        status = "No recording running to stop"
     else:
         retcode = proc.poll()
         if retcode is None:
-            print("recording ongoing, terminating it")
+            status = "recording ongoing, terminating it"
             proc.terminate()
         else:
-            print("recording stopped with returncode {}".format(retcode))
+            status = "recording stopped with returncode {}".format(retcode)
+    return make_response(jsonify({"status":status}))
 
 @api.route("/status")
 def status():
+    status = ""
     if proc is None:
-        print("No recording running")
+        status = "No recording running"
     else:
         retcode = proc.poll()
         if retcode is None:
-            print("recording ongoing")
+            status = "recording ongoing"
         else:
-            print("recording stopped with returncode {}".format(retcode))
+            status = "recording stopped with returncode {}".format(retcode)
+    return make_response(jsonify({"status":status}))
