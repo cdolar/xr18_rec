@@ -1,15 +1,13 @@
 from flask import Blueprint, jsonify, make_response
 from flask import current_app as app
 
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, TimeoutExpired
 from datetime import datetime
 from time import sleep
 
 import os
 
 api = Blueprint("api", __name__)
-
-proc = None
 
 @api.route("/rec")
 def rec():
@@ -19,23 +17,31 @@ def rec():
     buffersize = 512*1024
     channels = 12
     bits = 24
-    rate = 48
+    rate = 48000
     env = os.environ
     env['AUDIODEV']=audiodev
     cmd = [
         'rec',
-        '--buffer {}'.format(buffersize),
+        '--buffer={}'.format(buffersize),
         '-c {}'.format(channels),
         '-b {}'.format(bits),
         '-r {}'.format(rate),
         filename
     ]
+    global proc
     proc = Popen(cmd, env=env, stdout=PIPE, stderr=PIPE, text=True)
-    (output, err) = proc.communicate(timeout=2)
-    return make_response(jsonify({"status":"started recording", "filename":filename, "output":output, "error":err}))
+    output = ""
+    err = ""
+    #try:
+    #    (output, err) = proc.communicate(timeout=2)
+    #except TimeoutExpired:
+    #    pass
+    
+    return make_response(jsonify({"status":"started recording", "filename":filename, "output":output, "error":err, "pid":proc.pid,"args":proc.args}))
 
 @api.route("/stop")
 def stop():
+    global proc
     status = ""
     if proc is None:
         status = "No recording running to stop"
@@ -51,6 +57,7 @@ def stop():
 @api.route("/status")
 def status():
     status = ""
+    global proc
     if proc is None:
         status = "No recording running"
     else:
