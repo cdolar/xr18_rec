@@ -1,16 +1,24 @@
 from flask import Flask
+from flask_socketio import SocketIO
 
-def create_app(testing=False):
-    app = Flask(__name__)
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'MySecretKey!'
 
-    from xr18_rec.views.home import home
-    app.register_blueprint(home)
+socketio = SocketIO(app)
 
-    from xr18_rec.views.api import api
-    app.register_blueprint(api, url_prefix="/api")
+from xr18_rec.views.home import home
+app.register_blueprint(home)
 
-    return app
+from xr18_rec.views.api import api
+app.register_blueprint(api, url_prefix="/api")
 
+# def create_app(testing=False):
+#     app = Flask(__name__)
 
-if __name__ == "__main__":
-    app.run()
+#     from xr18_rec.views.home import home
+#     app.register_blueprint(home)
+
+#     from xr18_rec.views.api import api
+#     app.register_blueprint(api, url_prefix="/api")
+
+#     return app
