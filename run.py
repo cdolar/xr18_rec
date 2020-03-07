@@ -1,5 +1,4 @@
-from xr18_rec import create_app
+from xr18_rec import app, socketio
 
 if __name__=="__main__":
-    app = create_app(testing=True)
-    app.run()
+    socketio.run(app, host="0.0.0.0")
