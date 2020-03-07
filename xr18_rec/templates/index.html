@@ -13,14 +13,22 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col">
+            <div id="stdout_area"></div>
+        </div>
+    </div>
 </div>
 {% endblock main %}
 
 {% block script %}
-$('#record-btn').click(
-    function()
-    {
-        
-    }
-)
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+    socket.on('cmd_line_output', (data) => {
+        console.log(data);
+    });
+</script>
 {% endblock script %}
