@@ -15,7 +15,8 @@
     </div>
     <div class="row">
         <div class="col">
-            <div id="stdout_area"></div>
+            <textarea id="stdout-area" name="stdout-area" rows="10" cols="120" readonly>
+            </textarea>
         </div>
     </div>
 </div>
@@ -24,11 +25,28 @@
 {% block script %}
 <script type="text/javascript" charset="utf-8">
     var socket = io();
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
     socket.on('cmd_line_output', (data) => {
         console.log(data);
+        var $textarea = $('#stdout-area');
+        $textarea.append(data.stdout);
+        $textarea.scrollTop($textarea[0].scrollHeight);
+
+    });
+    
+    $(document).ready(function(){
+        var $textarea = $('#stdout-area');
+        $textarea.scrollTop($textarea[0].scrollHeight);
+    });
+
+    $('#record-btn').click( () => {
+        fetch("/api/rec")
+        .then( (data) => {
+            $('#stdout-area').text(data)
+        })
+    });
+
+    $('#stop-btn').click( () => {
+        fetch("/api/stop");
     });
 </script>
 {% endblock script %}
