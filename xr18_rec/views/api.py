@@ -47,10 +47,10 @@ def getStatus():
 @api.route("/rec")
 def rec():
     filename = datetime.now().strftime('%Y-%m-%d--%H-%M-%S__xr18rec.wav')
-    #audiodev = "hw:X18XR18,0"
-    audiodev = "hw:CODEC,0"
+    audiodev = "hw:X18XR18,0"
+    #audiodev = "hw:CODEC,0"
     buffersize = 512*1024
-    channels = 12
+    channels = 18
     bits = 24
     rate = 48000
     env = os.environ
