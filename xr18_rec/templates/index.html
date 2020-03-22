@@ -19,11 +19,21 @@
             </textarea>
         </div>
     </div>
+    <div class="row">
+        <div class="col">
+            <h1>Recorded Files</h1>
+            <button type="button" class="btn btn-lg btn-primary" id="update-filelist-btn" name="update-filelist-btn">Update</button>
+            <ul class="list-group list-group-flush" id="filelist"></ul>
+        </div>
+    </div>
 </div>
 {% endblock main %}
 
 {% block script %}
 <script type="text/javascript" charset="utf-8">
+    const filelist_elem = $("#filelist")
+    const file_req = new Request("/api/files");
+
     var socket = io();
     socket.on('cmd_line_output', (data) => {
         console.log(data);
@@ -36,17 +46,63 @@
     $(document).ready(function(){
         var $textarea = $('#stdout-area');
         $textarea.scrollTop($textarea[0].scrollHeight);
+        update_filelist();
     });
 
     $('#record-btn').click( () => {
         fetch("/api/rec")
         .then( (data) => {
             $('#stdout-area').text(data)
-        })
+        });
     });
 
     $('#stop-btn').click( () => {
         fetch("/api/stop");
     });
+
+    $('#update-filelist-btn').click( () => {
+        update_filelist();
+    });
+
+    function update_filelist() {
+        fetch(file_req)
+        .then( response => response.json() )
+        .then( data => {
+            filelist_elem.empty();
+            for (const f of data.files) {
+                // list item
+                let list_item = $("<li></li>");
+                list_item.addClass("list-group-item");
+                // div
+                let flex_div = $("<div></div>");
+                flex_div.addClass("d-flex justify-content-between");
+                flex_div.append($("<span></span").text(f.filename));
+                flex_div.append(
+                    $("<div></div>").addClass("btn-group")
+                    .append(
+                        $("<button></button>")
+                        .addClass("btn btn-outline-primary")
+                        .text("Play")
+                        .click( () => { 
+                            fetch("/api/play/" + f.filename);
+                        })
+                    )
+                    .append(
+                        $("<button></button>")
+                        .addClass("btn btn-outline-primary")
+                        .text("Download")
+                        .click( (e) => { 
+                            e.preventDefault(); 
+                            window.location.href = "api/download/"+f.filename;
+                        })
+                    )
+                );
+                // insert into DOM
+                list_item.append(flex_div);
+                filelist_elem.append(list_item);
+            }
+        });
+    }
+
 </script>
 {% endblock script %}
