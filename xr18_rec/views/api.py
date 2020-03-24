@@ -46,8 +46,8 @@ def rec():
     filename = datetime.now().strftime('%Y-%m-%d--%H-%M-%S__xr18rec.wav')
     audiodev = request.args.get("audiodev")
     if audiodev is None:
-        #audiodev = "hw:X18XR18,0"
-        audiodev = "hw:CODEC,0"
+        audiodev = "hw:X18XR18,0"
+        #audiodev = "hw:CODEC,0"
     buffersize = 512*1024
     channels = 18
     bits = 32
@@ -58,8 +58,8 @@ def rec():
         'rec',
         '--buffer={}'.format(buffersize),
         '-c {}'.format(channels),
-        '-b {}'.format(bits),
-        '-r {}'.format(rate),
+        #'-b {}'.format(bits),
+        #'-r {}'.format(rate),
         filename
     ]
     global proc
@@ -117,9 +117,9 @@ def get_files():
 def play(filename):
     audiodev = request.args.get("audiodev")
     if audiodev is None:
-        #audiodev = "hw:X18XR18,0"
-        audiodev = "hw:CODEC,0"
-    buffersize = 512*1024
+        audiodev = "hw:X18XR18,0"
+        #audiodev = "hw:CODEC,0"
+    buffersize = 8*1024
     channels = 18
     bits = 24
     rate = 48000
@@ -129,8 +129,8 @@ def play(filename):
         'play',
         '--buffer={}'.format(buffersize),
         '-c {}'.format(channels),
-        '-b {}'.format(bits),
-        '-r {}'.format(rate),
+        #'-b {}'.format(bits),
+        #'-r {}'.format(rate),
         filename
     ]
     global proc
