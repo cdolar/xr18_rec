@@ -43,7 +43,7 @@ def getStatus():
 
 @api.route("/rec")
 def rec():
-    filename = datetime.now().strftime('%Y-%m-%d--%H-%M-%S__xr18rec.wav')
+    filename = os.path.join("/media", "pi", "MUSIC2", datetime.now().strftime('%Y-%m-%d--%H-%M-%S__xr18rec.wav'))
     audiodev = request.args.get("audiodev")
     if audiodev is None:
         audiodev = "hw:X18XR18,0"
@@ -106,10 +106,13 @@ def status():
 
 @api.route("/files")
 def get_files():
+    curr_dir = os.getcwd()
+    os.chdir(os.path.join("/media","pi","MUSIC2"))
     files = sorted(glob("*.wav"))
     filedata = {"files":[]}
     for f in files:
         filedata["files"].append({"filename": f, "creation_time": localtime(os.path.getctime(f))})
+    os.chdir(curr_dir)
     return make_response(jsonify(filedata))
 
 
@@ -131,7 +134,7 @@ def play(filename):
         '-c {}'.format(channels),
         #'-b {}'.format(bits),
         #'-r {}'.format(rate),
-        filename
+        os.path.join("/media","pi","MUSIC2",filename)
     ]
     global proc
     if proc is not None:
@@ -156,7 +159,7 @@ def play(filename):
 def download(filename):
     print(filename)
     try:
-        return send_from_directory(os.path.abspath("."), filename=filename, as_attachment=True)
+        return send_from_directory(os.path.join("/media","pi","MUSIC2"), filename=filename, as_attachment=True)
     except FileNotFoundError:
         abort(404)
 
